@@ -1,11 +1,15 @@
 class Controls {
-  constructor() {
+  constructor(carType) {
     this.left = false;
     this.right = false;
     this.forward = false;
     this.reverse = false;
 
-    this.#addKeyboardListeners();
+    if (carType === "PLAYER") {
+      this.#addKeyboardListeners();
+    } else {
+      this.forward = true;
+    }
   }
 
   #addKeyboardListeners() {
