@@ -12,12 +12,41 @@ class Car {
     this.angle = 0;
 
     this.sensor = new Sensor(this);
+    this.polygon = [];
     this.controls = new Controls();
   }
 
   update(roadBorders) {
     this.#move();
+    this.polygon = this.#createPolygon();
     this.sensor.update(roadBorders);
+  }
+
+  #createPolygon() {
+    const radius = Math.hypot(this.width, this.height) / 2;
+    const alpha = Math.atan2(this.width, this.height);
+
+    const topLeft = {
+      x: this.x - Math.sin(this.angle + alpha) * radius,
+      y: this.y - Math.cos(this.angle + alpha) * radius,
+    };
+
+    const topRight = {
+      x: this.x - Math.sin(this.angle - alpha) * radius,
+      y: this.y - Math.cos(this.angle - alpha) * radius,
+    };
+
+    const bottomLeft = {
+      x: this.x - Math.sin(this.angle + Math.PI - alpha) * radius,
+      y: this.y - Math.cos(this.angle + Math.PI - alpha) * radius,
+    };
+
+    const bottomRight = {
+      x: this.x - Math.sin(this.angle + Math.PI + alpha) * radius,
+      y: this.y - Math.cos(this.angle + Math.PI + alpha) * radius,
+    };
+
+    return [topLeft, topRight, bottomRight, bottomLeft];
   }
 
   #move() {
@@ -66,16 +95,18 @@ class Car {
   }
 
   draw(ctx) {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(-this.angle);
-
+    // Draw car with polygon points
     ctx.beginPath();
-    ctx.rect(-this.width / 2, -this.height / 2, this.width, this.height);
+    this.polygon.forEach((point, i) => {
+      if (i == 0) {
+        ctx.moveTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
+      }
+    });
     ctx.fill();
 
-    ctx.restore();
-
+    // Draw sensor
     this.sensor.draw(ctx);
   }
 }
