@@ -12,7 +12,7 @@ function animate() {
   // refresh canvas
   canvas.height = window.innerHeight;
 
-  car.update();
+  car.update(road.borders);
 
   ctx.save();
   // move the canvas vertically based on the car's y position
