@@ -1,5 +1,4 @@
 const canvas = document.getElementById("canvas");
-canvas.height = window.innerHeight;
 canvas.width = 200;
 
 const ctx = canvas.getContext("2d");
@@ -14,7 +13,15 @@ function animate() {
   canvas.height = window.innerHeight;
 
   car.update();
+
+  ctx.save();
+  // move the canvas vertically based on the car's y position
+  // so that the car is always in the same place
+  ctx.translate(0, -car.y + canvas.height * 0.7);
+
   road.draw(ctx);
   car.draw(ctx);
+
+  ctx.restore();
   requestAnimationFrame(animate);
 }
