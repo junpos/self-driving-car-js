@@ -46,10 +46,10 @@ class Road {
     }
 
     ctx.setLineDash([]);
-    this.borders.forEach(([top, bottom]) => {
+    this.borders.forEach(([start, end]) => {
       ctx.beginPath();
-      ctx.moveTo(top.x, top.y);
-      ctx.lineTo(bottom.x, bottom.y);
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
       ctx.stroke();
     });
   }
