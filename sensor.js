@@ -6,10 +6,40 @@ class Sensor {
     this.raySpread = Math.PI / 2;
 
     this.rays = [];
+    this.readings = [];
   }
 
-  update() {
+  update(roadBorders) {
     this.#castRays();
+
+    this.readings = [];
+    this.rays.forEach((ray) => {
+      this.readings.push(this.#getReading(ray, roadBorders));
+    });
+  }
+
+  #getReading(ray, roadBorders) {
+    const touches = [];
+
+    for (const border of roadBorders) {
+      // { x, y, offset }
+      const touch = getIntersection(ray[0], ray[1], border[0], border[1]);
+
+      if (touch) {
+        touches.push(touch);
+      }
+    }
+
+    if (touches.length === 0) {
+      return null;
+    }
+
+    const touchWithMinOffset = touches.reduce(
+      (acc, touch) => (touch.offset < acc.offset ? touch : acc),
+      { offset: 1000000 }
+    );
+
+    return touchWithMinOffset;
   }
 
   #castRays() {
@@ -31,7 +61,13 @@ class Sensor {
   }
 
   draw(ctx) {
-    this.rays.forEach(([start, end]) => {
+    this.rays.forEach(([start, end], i) => {
+      if (this.readings[i]) {
+        // ray ends at the reading which is the closest intersection with the road borders
+        end = this.readings[i];
+      }
+
+      // Draw the rays
       ctx.beginPath();
       ctx.lineWidth = 2;
       ctx.strokeStyle = "yellow";
@@ -39,6 +75,14 @@ class Sensor {
       ctx.moveTo(start.x, start.y);
       ctx.lineTo(end.x, end.y);
       ctx.stroke();
+
+      // Draw the readings
+      if (this.readings[i]) {
+        ctx.beginPath();
+        ctx.arc(this.readings[i].x, this.readings[i].y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "red";
+        ctx.fill();
+      }
     });
   }
 }
